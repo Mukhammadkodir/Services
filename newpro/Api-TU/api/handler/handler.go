@@ -3,12 +3,12 @@ package handlers
 import (
 	"errors"
 	"net/http"
-	"newpro/Api-TU/api/models"
-	"newpro/Api-TU/api/token"
-	"newpro/Api-TU/config"
-	"newpro/Api-TU/pkg/logger"
-	"newpro/Api-TU/services"
-	"newpro/Api-TU/storage/repo"
+	"github/Services/newpro/Api-TU/api/models"
+	"github/Services/newpro/Api-TU/api/token"
+	"github/Services/newpro/Api-TU/config"
+	"github/Services/newpro/Api-TU/pkg/logger"
+	"github/Services/newpro/Api-TU/services"
+	"github/Services/newpro/Api-TU/storage/repo"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"

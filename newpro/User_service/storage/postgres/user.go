@@ -3,7 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	pb "newpro/User_service/genproto/user_service"
+	pb "github/Services/newpro/User_service/genproto/user_service"
 	"time"
 
 	"github.com/jmoiron/sqlx"

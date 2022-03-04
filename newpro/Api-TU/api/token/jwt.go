@@ -3,7 +3,7 @@ package token
 import (
 	"time"
 
-	"newpro/Api-TU/pkg/logger"
+	"github/Services/newpro/Api-TU/pkg/logger"
 
 	"github.com/dgrijalva/jwt-go"
 )

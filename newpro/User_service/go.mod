@@ -1,4 +1,4 @@
-module newpro/User_service
+module github/Services/newpro/User_service
 
 go 1.17
 

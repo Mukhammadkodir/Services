@@ -5,12 +5,12 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
-	"newpro/Api-TU/api"
-	"newpro/Api-TU/config"
-	"newpro/Api-TU/pkg/logger"
-	"newpro/Api-TU/services"
-	rds "newpro/Api-TU/storage/redis"
-	"newpro/Api-TU/storage/repo"
+	"github/Services/newpro/Api-TU/api"
+	"github/Services/newpro/Api-TU/config"
+	"github/Services/newpro/Api-TU/pkg/logger"
+	"github/Services/newpro/Api-TU/services"
+	rds "github/Services/newpro/Api-TU/storage/redis"
+	"github/Services/newpro/Api-TU/storage/repo"
 )
 
 func main() {

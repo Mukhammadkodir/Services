@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	em "newpro/Task_service/genproto/email_service"
-	pb "newpro/Task_service/genproto/task_service"
-	pbt "newpro/Task_service/genproto/user_service"
+	em "github/Services/newpro/Task_service/genproto/email_service"
+	pb "github/Services/newpro/Task_service/genproto/task_service"
+	pbt "github/Services/newpro/Task_service/genproto/user_service"
 
-	l "newpro/Task_service/pkg/logger"
-	grpcClient "newpro/Task_service/service/grpc_client"
-	"newpro/Task_service/storage"
+	l "github/Services/newpro/Task_service/pkg/logger"
+	grpcClient "github/Services/newpro/Task_service/service/grpc_client"
+	"github/Services/newpro/Task_service/storage"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"

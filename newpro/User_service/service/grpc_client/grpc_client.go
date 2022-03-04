@@ -2,9 +2,9 @@ package grpc_client
 
 import (
 	"fmt"
-	"newpro/User_service/config"
+	"github/Services/newpro/User_service/config"
 
-	pb "newpro/User_service/genproto/task_service"
+	pb "github/Services/newpro/User_service/genproto/task_service"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

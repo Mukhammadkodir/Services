@@ -1,13 +1,13 @@
 package api
 
 import (
-	v1 "newpro/Api-TU/api/handler"
-	"newpro/Api-TU/config"
-	"newpro/Api-TU/pkg/logger"
-	"newpro/Api-TU/services"
-	"newpro/Api-TU/storage/repo"
+	v1 "github/Services/newpro/Api-TU/api/handler"
+	"github/Services/newpro/Api-TU/config"
+	"github/Services/newpro/Api-TU/pkg/logger"
+	"github/Services/newpro/Api-TU/services"
+	"github/Services/newpro/Api-TU/storage/repo"
 
-	"newpro/Api-TU/api/docs"
+	"github/Services/newpro/Api-TU/api/docs"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"

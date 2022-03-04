@@ -2,10 +2,10 @@ package services
 
 import (
 	"fmt"
-	"newpro/Api-TU/config"
-	em "newpro/Api-TU/genproto/email_service"
-	pbt "newpro/Api-TU/genproto/task_service"
-	pbu "newpro/Api-TU/genproto/user_service"
+	"github/Services/newpro/Api-TU/config"
+	em "github/Services/newpro/Api-TU/genproto/email_service"
+	pbt "github/Services/newpro/Api-TU/genproto/task_service"
+	pbu "github/Services/newpro/Api-TU/genproto/user_service"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

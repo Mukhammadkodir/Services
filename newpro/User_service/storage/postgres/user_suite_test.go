@@ -1,10 +1,10 @@
 package postgres
 
 import (
-	"newpro/User_service/config"
-	pb "newpro/User_service/genproto/user_service"
-	"newpro/User_service/pkg/db"
-	"newpro/User_service/storage/repo"
+	"github/Services/newpro/User_service/config"
+	pb "github/Services/newpro/User_service/genproto/user_service"
+	"github/Services/newpro/User_service/pkg/db"
+	"github/Services/newpro/User_service/storage/repo"
 
 	"testing"
 

@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"database/sql"
-	pb "newpro/Task_service/genproto/task_service"
+	pb "github/Services/newpro/Task_service/genproto/task_service"
 	"time"
 
 	"github.com/jmoiron/sqlx"

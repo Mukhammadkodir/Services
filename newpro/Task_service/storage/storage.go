@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"newpro/Task_service/storage/postgres"
-	"newpro/Task_service/storage/repo"
+	"github/Services/newpro/Task_service/storage/postgres"
+	"github/Services/newpro/Task_service/storage/repo"
 
 	"github.com/jmoiron/sqlx"
 )

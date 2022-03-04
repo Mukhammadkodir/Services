@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"newpro/Task_service/config"
+	"github/Services/newpro/Task_service/config"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"

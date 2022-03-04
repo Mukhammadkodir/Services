@@ -1,8 +1,8 @@
 package repo
 
 import (
-	pb "newpro/Task_service/genproto/task_service"
-	em "newpro/Task_service/genproto/email_service"
+	pb "github/Services/newpro/Task_service/genproto/task_service"
+	em "github/Services/newpro/Task_service/genproto/email_service"
 )
 
 //TaskStorageI ...

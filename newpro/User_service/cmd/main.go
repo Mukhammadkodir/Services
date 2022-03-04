@@ -2,12 +2,12 @@ package main
 
 import (
 	"net"
-	"newpro/User_service/config"
-	pb "newpro/User_service/genproto/user_service"
-	"newpro/User_service/pkg/db"
-	"newpro/User_service/pkg/logger"
-	"newpro/User_service/service"
-	"newpro/User_service/service/grpc_client"
+	"github/Services/newpro/User_service/config"
+	pb "github/Services/newpro/User_service/genproto/user_service"
+	"github/Services/newpro/User_service/pkg/db"
+	"github/Services/newpro/User_service/pkg/logger"
+	"github/Services/newpro/User_service/service"
+	"github/Services/newpro/User_service/service/grpc_client"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

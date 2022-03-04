@@ -2,7 +2,7 @@ package redis
 
 import (
 	rd "github.com/gomodule/redigo/redis"
-	"newpro/Api-TU/storage/repo"
+	"github/Services/newpro/Api-TU/storage/repo"
 )
 
 type redisRepo struct {

@@ -1,4 +1,4 @@
-module newpro/Task_service
+module github/Services/newpro/Task_service
 
 go 1.17
 

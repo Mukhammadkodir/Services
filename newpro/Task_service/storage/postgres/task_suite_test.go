@@ -1,10 +1,10 @@
 package postgres
 
 import (
-	"newpro/Task_service/config"
-	pb "newpro/Task_service/genproto/task_service"
-	"newpro/Task_service/pkg/db"
-	"newpro/Task_service/storage/repo"
+	"github/Services/newpro/Task_service/config"
+	pb "github/Services/newpro/Task_service/genproto/task_service"
+	"github/Services/newpro/Task_service/pkg/db"
+	"github/Services/newpro/Task_service/storage/repo"
 	"testing"
 
 	"github.com/stretchr/testify/suite"

@@ -3,9 +3,9 @@ package handlers
 import (
 	"context"
 	"net/http"
-	_ "newpro/Api-TU/api/models"
-	pb "newpro/Api-TU/genproto/task_service"
-	l "newpro/Api-TU/pkg/logger"
+	_ "github/Services/newpro/Api-TU/api/models"
+	pb "github/Services/newpro/Api-TU/genproto/task_service"
+	l "github/Services/newpro/Api-TU/pkg/logger"
 
 	//user "newpro/Api-TU/genproto/user_service"
 	"time"
