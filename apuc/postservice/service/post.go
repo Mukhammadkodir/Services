@@ -5,6 +5,7 @@ import (
 
 	pb "github/Services/apuc/postservice/genproto/post_service"
 	l "github/Services/apuc/postservice/pkg/logger"
+	grpcClient "github/Services/apuc/postservice/service/grpc_client"
 
 	"github/Services/apuc/postservice/storage"
 
@@ -15,13 +16,15 @@ import (
 type PostService struct {
 	storage storage.IStorage
 	logger  l.Logger
+	client  grpcClient.GrpcClientI
 }
 
 //NewPostService ...
-func NewPostService(db *sqlx.DB, log l.Logger) *PostService {
+func NewPostService(db *sqlx.DB, log l.Logger, client grpcClient.GrpcClientI) *PostService {
 	return &PostService{
 		storage: storage.NewStoragePg(db),
 		logger:  log,
+		client:  client,
 	}
 }
 

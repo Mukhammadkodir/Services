@@ -47,3 +47,8 @@ message ById {
     string userid = 1;
 }
 
+message Comment {
+    int64 post_id = 1;
+    int64 user_id = 2;
+    string text = 3;
+}

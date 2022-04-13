@@ -6,6 +6,7 @@ import (
 	"github/Services/apuc/postservice/pkg/logger"
 	"github/Services/apuc/postservice/service"
 	"github/Services/apuc/postservice/config"
+	"github/Services/apuc/postservice/service/grpc_client"
 	"net"
 
 	"google.golang.org/grpc"
@@ -28,9 +29,13 @@ func main() {
 		log.Fatal("sqlx connection to postgres error", logger.Error(err))
 	}
 
-	
+	grpcClient, err := grpc_client.New(cfg)
+	if err != nil {
+		log.Error("error establishing grpc connection", logger.Error(err))
+		return
+	}
 
-	postService := service.NewPostService(connDB, log)
+	postService := service.NewPostService(connDB, log, grpcClient)
 
 	lis, err := net.Listen("tcp", cfg.RPCPort)
 	if err != nil {

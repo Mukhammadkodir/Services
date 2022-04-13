@@ -64,7 +64,7 @@ func (s *UserService) Update(ctx context.Context, req *pb.Comment) (*pb.Comment,
 	return user, nil
 }
 
-func (s *UserService) ListUser(ctx context.Context, req *pb.ListReq) (*pb.ListResp, error) {
+func (s *UserService) ListComment(ctx context.Context, req *pb.ListReq) (*pb.ListResp, error) {
 	resp, err := s.storage.Comment().ListComment(req)
 	if err != nil {
 		s.logger.Error("Error list Users", l.Error(err))

@@ -44,10 +44,10 @@ func (s *UserService) Create(ctx context.Context, req *pb.User) (*pb.User, error
 	req.Id = uuid.New().String()
 	User, err := s.storage.User().Create(req)
 	if err != nil {
-		s.logger.Error("Error create User \n \n", l.Error(err))
+		s.logger.Error("Error create User ", l.Error(err))
 		return nil, err
 	}
-	fmt.Println("\n\n\n error", err)
+	fmt.Println(" error", err)
 	return User, nil
 }
 
