@@ -17,6 +17,9 @@ type Config struct {
 
 	LogLevel string
 	RPCPort  string
+
+	PostServiceHost  string
+	PostServicePort  int
 }
 
 // Load loads environment vars and inflates Config
@@ -33,7 +36,11 @@ func Load() Config {
 
 	c.LogLevel = cast.ToString(getOrReturnDefault("LOG_LEVEL", "debug"))
 
-	c.RPCPort = cast.ToString(getOrReturnDefault("RPC_PORT", ":9292"))
+	c.RPCPort = cast.ToString(getOrReturnDefault("RPC_PORT", ":9595"))
+
+	c.PostServiceHost = cast.ToString(getOrReturnDefault("POST_SERVICE_HOST", "localhost"))
+	c.PostServicePort = cast.ToInt(getOrReturnDefault("POST_SERVICE_PORT", 9191))
+
 
 	return c
 }

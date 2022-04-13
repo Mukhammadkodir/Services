@@ -9,6 +9,8 @@ service CommentService {
     rpc Delete(ById) returns (Empty);
     rpc Update(Comment) returns(Comment);
     rpc ListComment(ListReq) returns(ListResp);
+    rpc DeleteByUser(ById) returns (Empty);
+
 }
 
 

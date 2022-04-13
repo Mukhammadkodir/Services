@@ -41,7 +41,7 @@ func (r *PostRepo) Create(req *pb.Post) (*pb.Post, error) {
 
 	err := r.db.DB.QueryRow(query,
 		id,
-		id,
+		req.UserId,
 		req.Title,
 		req.CreatedAt,
 		pq.Array(a),
@@ -60,6 +60,22 @@ func (r *PostRepo) Delete(id *pb.ById) (*pb.Empty, error) {
 		UPDATE postos SET 
 			deleted_at = $1
 		WHERE id = $2
+	`
+	newTime := time.Now().Format("2006-01-02 15:04:05")
+
+	_, err := r.db.DB.Exec(query, newTime, id.Userid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.Empty{}, nil
+}
+
+func (r *PostRepo) DeleteByUser(id *pb.ById) (*pb.Empty, error) {
+	query := `
+		UPDATE postos SET 
+			deleted_at = $1
+		WHERE userid = $2
 	`
 	newTime := time.Now().Format("2006-01-02 15:04:05")
 

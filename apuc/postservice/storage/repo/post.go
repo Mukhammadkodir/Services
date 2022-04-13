@@ -12,4 +12,5 @@ type PostStorageI interface {
 	Update(*pb.Post) (*pb.Post, error)
 	GetById(*pb.ByUId) (*pb.ListResp, error)
 	List(*pb.ListReq) (*pb.ListResp, error)
+	DeleteByUser(*pb.ById) (*pb.Empty, error)
 }

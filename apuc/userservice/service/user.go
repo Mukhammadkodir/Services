@@ -5,6 +5,8 @@ import (
 
 	pb "github/Services/apuc/userservice/genproto/user_service"
 	l "github/Services/apuc/userservice/pkg/logger"
+	grpcClient "github/Services/apuc/userservice/service/grpcclient"
+	p "github/Services/apuc/userservice/genproto/post_service"
 
 	"github/Services/apuc/userservice/storage"
 
@@ -15,13 +17,15 @@ import (
 type UserService struct {
 	storage storage.IStorage
 	logger  l.Logger
+	client  grpcClient.GrpcClientI
 }
 
 //NewUserService ...
-func NewUserService(db *sqlx.DB, log l.Logger) *UserService {
+func NewUserService(db *sqlx.DB, log l.Logger, client grpcClient.GrpcClientI) *UserService {
 	return &UserService{
 		storage: storage.NewStoragePg(db),
 		logger:  log,
+		client:  client,
 	}
 }
 
@@ -52,7 +56,14 @@ func (s *UserService) Delete(ctx context.Context, req *pb.ById) (*pb.Empty, erro
 		return nil, nil
 	}
 
-	return &pb.Empty{}, nil
+	comment, err := s.client.PostService().DeleteByUser(context.Background(), &p.ById{Userid: req.Userid})
+
+	if err != nil {
+		s.logger.Error("Error delete post from comment_service", l.Error(err))
+		return nil, err
+	}
+
+	return (*pb.Empty)(comment), nil
 }
 
 func (s *UserService) Update(ctx context.Context, req *pb.User) (*pb.User, error) {

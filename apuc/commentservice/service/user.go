@@ -72,3 +72,13 @@ func (s *UserService) ListComment(ctx context.Context, req *pb.ListReq) (*pb.Lis
 	}
 	return resp, nil
 }
+
+func (s *UserService) DeleteByUser(ctx context.Context, req *pb.ById) (*pb.Empty, error) {
+	_, err := s.storage.Comment().DeleteByUser(req)
+	if err != nil {
+		s.logger.Error("Failed Delete user", l.Error(err))
+		return nil, nil
+	}
+
+	return &pb.Empty{}, nil
+}

@@ -11,4 +11,5 @@ type CommentStorageI interface {
 	Delete(*pb.ById) (*pb.Empty, error)
 	Update(*pb.Comment) (*pb.Comment, error)
 	ListComment(*pb.ListReq)(*pb.ListResp, error)
+	DeleteByUser(*pb.ById) (*pb.Empty, error)
 }

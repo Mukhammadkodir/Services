@@ -1,9 +1,8 @@
 package postgres
 
 import (
-	pb "github/Services/apuc/commentservice/genproto/comment_service"
 	"database/sql"
-	"fmt"
+	pb "github/Services/apuc/commentservice/genproto/comment_service"
 
 	"time"
 
@@ -28,23 +27,23 @@ func (r *commentRepo) Create(comment *pb.Comment) (*pb.Comment, error) {
 			post_id, 
 			text, 
 			created_at )
-    VALUES($1, $2, $3, $4, $5) RETURNING id`
+    VALUES($1, $2, $3, $4, $5) RETURNING post_id`
 
 	id := uuid.New().String()
 
 	err := r.db.QueryRow(query,
 		id,
+		comment.UserId,
 		comment.PostId,
 		comment.Text,
-		comment.UserId,
 		time.Now().Format("2006-01-02"),
-	).Scan(&comment.Id)
+	).Scan(&comment.PostId)
 
 	if err != nil {
 		return nil, err
 	}
 
-	comment1, err := r.Get(&pb.ById{Id: comment.Id})
+	comment1, err := r.Get(&pb.ById{Id: comment.PostId})
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +53,7 @@ func (r *commentRepo) Create(comment *pb.Comment) (*pb.Comment, error) {
 
 func (r *commentRepo) Get(in *pb.ById) (*pb.Comment, error) {
 	var (
-		comment       pb.Comment
+		comment    pb.Comment
 		nullupdate sql.NullString
 		nulldelete sql.NullString
 	)
@@ -67,7 +66,7 @@ func (r *commentRepo) Get(in *pb.ById) (*pb.Comment, error) {
 				updated_at, 
 				deleted_at 
 			FROM comment 
-			WHERE id = $1 AND deleted_at IS NULL`
+			WHERE post_id = $1 AND deleted_at IS NULL`
 
 	err := r.db.QueryRow(query, in.Id).Scan(
 		&comment.Id,
@@ -89,12 +88,27 @@ func (r *commentRepo) Get(in *pb.ById) (*pb.Comment, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &comment, nil
 }
 
 func (r *commentRepo) Delete(in *pb.ById) (*pb.Empty, error) {
-	query := `UPDATE comment SET deleted_at = $1 WHERE id = $2`
+	query := `UPDATE comment SET deleted_at = $1 WHERE post_id = $2`
+
+	res, err := r.db.Exec(query, time.Now().Format("2006-01-02"), in.Id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if a, _ := res.RowsAffected(); a > 0 || err != nil {
+		return nil, err
+	}
+
+	return &pb.Empty{}, nil
+}
+
+func (r *commentRepo) DeleteByUser(in *pb.ById) (*pb.Empty, error) {
+	query := `UPDATE comment SET deleted_at = $1 WHERE user_id = $2`
 
 	res, err := r.db.Exec(query, time.Now().Format("2006-01-02"), in.Id)
 
@@ -114,19 +128,18 @@ func (r *commentRepo) Update(comment *pb.Comment) (*pb.Comment, error) {
 	query := `UPDATE comment SET 
 				text = $1,  
 				updated_at = $2 
-				WHERE id = $3 AND deleted_at IS NULL`
+			 WHERE post_id = $3 AND deleted_at IS NULL`
 	err := r.db.QueryRow(query,
 		comment.Text,
 		time.Now().Format("2006-01-02"),
-		comment.Id,
+		comment.PostId,
 	).Err()
 
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
-	return r.Get(&pb.ById{Id: comment.Id})
+	return r.Get(&pb.ById{Id: comment.PostId})
 }
 
 func (r *commentRepo) ListComment(req *pb.ListReq) (*pb.ListResp, error) {
@@ -135,7 +148,7 @@ func (r *commentRepo) ListComment(req *pb.ListReq) (*pb.ListResp, error) {
 	var (
 		nullupdate sql.NullString
 		nulldelete sql.NullString
-		resp pb.ListResp
+		resp       pb.ListResp
 	)
 	query := `
 		SELECT 
@@ -176,7 +189,6 @@ func (r *commentRepo) ListComment(req *pb.ListReq) (*pb.ListResp, error) {
 		if nulldelete.Valid {
 			comment.DeletedAt = nulldelete.String
 		}
-	
 
 		resp.Comments = append(resp.Comments, &comment)
 	}
@@ -189,8 +201,6 @@ func (r *commentRepo) ListComment(req *pb.ListReq) (*pb.ListResp, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &resp, nil
 }
-
-

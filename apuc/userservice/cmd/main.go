@@ -6,6 +6,7 @@ import (
 	"github/Services/apuc/userservice/pkg/db"
 	"github/Services/apuc/userservice/pkg/logger"
 	"github/Services/apuc/userservice/service"
+	"github/Services/apuc/userservice/service/grpcclient"
 
 
 	"net"
@@ -30,7 +31,13 @@ func main() {
 		log.Fatal("sqlx connection to postgres error", logger.Error(err))
 	}
 
-	userService := service.NewUserService(connDB, log)
+	grpcClient, err := grpc_client.New(cfg)
+	if err != nil {
+		log.Error("error establishing grpc connection", logger.Error(err))
+		return
+	}
+
+	userService := service.NewUserService(connDB, log, grpcClient)
 
 	lis, err := net.Listen("tcp", cfg.RPCPort)
 	if err != nil {
