@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+
+package user;
+
+service UserService {
+    rpc Create(Comment) returns (Comment);
+    rpc Get(ById) returns(Comment);
+    rpc Delete(ById) returns (Empty);
+    rpc Update(Comment) returns(Comment);
+    rpc ListComment(ListReq) returns(ListResp);
+}
+
+
+message Empty {}
+
+message Comment {
+    string  id = 1;
+    string post_id = 2;
+    string user_id = 3;
+    string text = 5;
+    string created_at = 6;
+    string updated_at = 7;
+    string deleted_at = 8;
+}
+
+
+message ListResp {
+    repeated Comment Comments = 1;
+    int64 count = 2;
+}
+
+message ListReq {
+    int64 page = 1;
+    int64 limit = 2;
+}
+
+
+message ById {
+    string id = 1;
+}
+
