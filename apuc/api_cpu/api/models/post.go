@@ -5,6 +5,7 @@ type Post struct {
 	User_id    string `json:"user_id"`
 	Title      string `json:"title"`
 	Comment    string `json:"comment"`
+	Image    string `json:"image"`
 	Created_at string `json:"created_at"`
 	Updated_at string `json:"updated_at"`
 	Deleted_at string `json:"deleted_at"`
@@ -14,6 +15,7 @@ type CreatePost struct {
 	User_id string `json:"user_id"`
 	Title   string `json:"title"`
 	Comment string `json:"comment"`
+	Image    string `json:"image"`
 }
 
 type UpdatePost struct {
@@ -21,21 +23,6 @@ type UpdatePost struct {
 	User_id string `json:"user_id"`
 	Title   string `json:"title"`
 	Comment string `json:"comment"`
+	Image    string `json:"image"`
 }
 
-type ListReq struct {
-	Page  string `json:"page"`
-	Limit string `json:"limit"`
-}
-
-type ById struct {
-	User_id string `json:"user_id"`
-	Page    string `json:"page"`
-	Limit   string `json:"limit"`
-}
-
-type Comment struct {
-	User_id string `json:"user_id"`
-	Post_id string `json:"post_id"`
-	Text    string `json:"text"`
-}
