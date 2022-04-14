@@ -13,9 +13,9 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// @title 			Task api
+// @title 			Post api
 // @version			1.0
-// @description		This is User and Task service Api
+// @description		This is User and Post service Api
 // @termsOfService	http://swagger.io/terms/
 
 // @securityDefinitions.apikey BearerAuth

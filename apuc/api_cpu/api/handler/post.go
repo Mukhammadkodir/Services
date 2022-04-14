@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"context"
-	"net/http"
 	_ "github/Services/apuc/api_cpu/api/models"
 	pb "github/Services/apuc/api_cpu/genproto/post_service"
 	l "github/Services/apuc/api_cpu/pkg/logger"
+	"net/http"
 
 	"time"
 
@@ -14,7 +14,7 @@ import (
 )
 
 // CreatePost godoc
-// @Summary Create new task
+// @Summary Create new post
 // @Description This API for creating a new post
 // @Tags Post
 // @Accept json
@@ -47,14 +47,14 @@ func (h *handlerV1) CreatePost(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to create task", l.Error(err))
+		h.log.Error("failed to create post", l.Error(err))
 		return
 	}
 	c.JSON(http.StatusCreated, response)
 }
 
 // GetPost godoc
-// @Summary Get task
+// @Summary Get post
 // @Description  Get post
 // @Tags Post
 // @Accept json
@@ -70,13 +70,13 @@ func (h *handlerV1) GetPost(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
 	defer cancel()
 
-	response, err := h.serviceManager.PostService().Get( ctx, &pb.ById{Userid: guid	})
+	response, err := h.serviceManager.PostService().Get(ctx, &pb.ById{Userid: guid})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to get task", l.Error(err))
+		h.log.Error("failed to get post", l.Error(err))
 		return
 	}
 
@@ -117,7 +117,7 @@ func (h *handlerV1) UpdatePost(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to update user", l.Error(err))
+		h.log.Error("failed to update post", l.Error(err))
 		return
 	}
 
@@ -142,14 +142,13 @@ func (h *handlerV1) DeletePost(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
 	defer cancel()
 
-	response, err := h.serviceManager.PostService().Delete(	ctx, &pb.ById{Userid: guid })
-
+	response, err := h.serviceManager.PostService().Delete(ctx, &pb.ById{Userid: guid})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to delete task", l.Error(err))
+		h.log.Error("failed to delete post", l.Error(err))
 		return
 	}
 

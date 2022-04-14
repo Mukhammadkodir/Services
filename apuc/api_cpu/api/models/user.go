@@ -21,7 +21,7 @@ type By_Id struct {
 }
 
 type CreateUser struct {
-	Name     string `json:"first_name"`
+	Name     string `json:"name"`
 	Username string `json:"username"`
 	City     string `json:"city"`
 }
