@@ -11,6 +11,7 @@ type Config struct {
 	Environment      string // develop, staging, production
 	PostgresHost     string
 	PostgresPort     int
+					
 	PostgresDatabase string
 	PostgresUser     string
 	PostgresPassword string

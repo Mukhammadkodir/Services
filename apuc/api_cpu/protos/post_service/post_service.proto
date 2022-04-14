@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+
+package post;
+
+service UserService {
+    rpc Create(Post) returns (Post);
+    rpc Delete(ById) returns (Empty);
+    rpc Update(Post) returns(Post);
+    rpc List(ListReq) returns(ListResp);
+    rpc GetById(ByUId) returns(ListResp);
+    rpc Get(ById) returns(Post);
+    rpc DeleteByUser(ById) returns (Empty);
+}
+
+message Empty {}
+            
+message Post {
+    string  id = 1;
+    string user_id = 2;
+    string title = 3;
+    repeated Photo image = 4;
+    string comment = 5;
+    string created_at = 6;
+    string updated_at = 7;
+    string deleted_at = 8;
+}
+message Photo {
+    string image = 1;
+}
+
+message ListResp {
+    repeated Post posts = 1;
+    int64 count = 2;
+}
+
+message ListReq {
+    int64 page = 1;
+    int64 limit = 2;
+}
+message ByUId {
+    int64 page = 1;
+    int64 limit = 2;
+    string userid = 3;
+}
+
+message ById {
+    string userid = 1;
+}
+
+message Comment {
+    int64 post_id = 1;
+    int64 user_id = 2;
+    string text = 3;
+}
