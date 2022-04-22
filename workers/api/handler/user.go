@@ -1,17 +1,13 @@
 package handlers
 
 import (
-	"context"
-	"fmt"
-	"net/http"
 	"github/Services/workers/api/models"
 	_ "github/Services/workers/api/models"
 	pb "github/Services/workers/genproto/user_service"
 	l "github/Services/workers/pkg/logger"
-	"time"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -41,10 +37,8 @@ func (h *handlerV1) CreateUser(c *gin.Context) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
-	defer cancel()
+	response, err := h.inMemoryStorage.Create(&body)
 
-	response, err := h.serviceManager.UserService().Create(ctx, &body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -63,22 +57,40 @@ func (h *handlerV1) CreateUser(c *gin.Context) {
 // @Security 	BearerAuth
 // @Tags User
 // @Accept json
-// @Param id path string true "ID"
+// @Param body body models.GetUser true "body"
 // @Produce json
-// @Success 200 {object} models.User
+// @Success 200 {object} models.Get
 // @Router /user/{id} [get]
 func (h *handlerV1) Get(c *gin.Context) {
-	var jspbMarshal protojson.MarshalOptions
+	var (
+		body        pb.LogReq
+		jspbMarshal protojson.MarshalOptions
+	)
+
 	jspbMarshal.UseProtoNames = true
+	err := c.ShouldBindJSON(&body)
 
-	guid := c.Param("id")
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
-	defer cancel()
-
-	response, err := h.serviceManager.UserService().Get(
-		ctx, &pb.IdReq{
-			Id: guid,
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
 		})
+		h.log.Error("failed to bind json", l.Error(err))
+		return
+	}
+
+	res, _ := h.inMemoryStorage.CheckField(&pb.PasswordReq{Password: body.Password})
+
+	if res.Position != "Admin" {
+		c.JSON(http.StatusBadRequest, models.ResponseError{
+			Error: models.InternalServerError{
+				Message: "You have not permission to get user information",
+			},
+		})
+		h.log.Error("failed to get User", l.Error(err))
+		return
+	}
+
+	response, err := h.inMemoryStorage.Get(&pb.ById{Userid: body.Id})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -99,48 +111,14 @@ func (h *handlerV1) Get(c *gin.Context) {
 // @Security 	BearerAuth
 // @Tags User
 // @Accept json
-// @Param body body models.Login true "body"
+// @Param code path string true "Password"
 // @Produce json
 // @Success 200 {object} models.User
 // @Router /user [post]
 func (h *handlerV1) Login(c *gin.Context) {
-	var (
-		body        pb.Login1
-		jspbMarshal protojson.MarshalOptions
-	)
-	jspbMarshal.UseProtoNames = true
+	code := c.Param("code")
 
-	err := c.ShouldBindJSON(&body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		h.log.Error("failed to bind json", l.Error(err))
-		return
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
-	defer cancel()
-
-	response, err := h.serviceManager.UserService().Login(ctx, &pb.Login1{
-		Password: string(body.Password),
-		Email:    body.Email,
-	})
-
-	// Creating hash of a password
-	compareErr := bcrypt.CompareHashAndPassword([]byte(response.Password), []byte(body.Password))
-	
-
-	if compareErr != nil {
-		c.JSON(http.StatusConflict, models.ResponseError{
-			Error: models.InternalServerError{
-				Message: "Password Error",
-			},
-		})
-		return
-	}
-
-	
+	response, err := h.inMemoryStorage.Login(&pb.PasswordReq{Password: code})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -160,32 +138,28 @@ func (h *handlerV1) Login(c *gin.Context) {
 // @Security 	BearerAuth
 // @Tags User
 // @Accept json
-// @Param body body models.UpdateUser true "body"
+// @Param body body models.UpReq true "body"
 // @Produce json
 // @Success 200 {object} models.User
 // @Router /user/{id} [put]
 func (h *handlerV1) UpdateUser(c *gin.Context) {
 	var (
-		body        pb.User
+		body        pb.UpReq
 		jspbMarshal protojson.MarshalOptions
 	)
 
-	bul, err := h.serviceManager.UserService().CheckField(c, &pb.Check{Field: "username", Value: body.Username})
-	fmt.Println(bul.Status)
-
-	if bul.Status != false {
-		c.JSON(int(http.StatusAccepted), "This username or email already is registered")
-		return
-	}
-
-	bul, err = h.serviceManager.UserService().CheckField(c, &pb.Check{Field: "email", Value: body.Email})
-	if bul.Status != false {
-		c.JSON(int(http.StatusAccepted), "This email already or email is registered")
-
-		return
-	}
-
 	jspbMarshal.UseProtoNames = true
+	err := c.ShouldBindJSON(&body)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		h.log.Error("failed to bind json", l.Error(err))
+		return
+	}
+
+	bul, err := h.inMemoryStorage.Update(&body)
 
 	err = c.ShouldBindJSON(&body)
 	if err != nil {
@@ -196,19 +170,7 @@ func (h *handlerV1) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
-	defer cancel()
-
-	response, err := h.serviceManager.UserService().Update(ctx, &body)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		h.log.Error("failed to update user", l.Error(err))
-		return
-	}
-
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, bul)
 }
 
 // @Summary DeleteUser
@@ -216,7 +178,7 @@ func (h *handlerV1) UpdateUser(c *gin.Context) {
 // @Description  Delete User
 // @Security 	BearerAuth
 // @Tags User
-// @Param id path string true "ID"
+// @Param password path string true "Password"
 // @Accept json
 // @Produce json
 // @Success 200
@@ -225,14 +187,9 @@ func (h *handlerV1) DeleteUser(c *gin.Context) {
 	var jspbMarshal protojson.MarshalOptions
 	jspbMarshal.UseProtoNames = true
 
-	guid := c.Param("id")
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
-	defer cancel()
+	guid := c.Param("password")
 
-	response, err := h.serviceManager.UserService().Delete(
-		ctx, &pb.IdReq{
-			Id: guid,
-		})
+	response, err := h.inMemoryStorage.Delete(&pb.PasswordReq{Password: guid})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -243,4 +200,3 @@ func (h *handlerV1) DeleteUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
-

@@ -4,7 +4,7 @@ import (
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation"
-	_"github.com/go-ozzo/ozzo-validation/is"
+	_ "github.com/go-ozzo/ozzo-validation/is"
 )
 
 type User struct {
@@ -19,7 +19,23 @@ type User struct {
 	Deleted_at string `json:"deleted_at"`
 }
 
-type GetUser struct {
+type UpReq struct {
+	F_name   string `json:"f_name"`
+	L_name   string `json:"l_name"`
+	New_password string `json:"new_password"`
+	Old_password  string `json:"old_password"`
+	Position string `json:"position"`
+}
+
+type CreateUser struct {
+	F_name   string `json:"f_name"`
+	L_name   string `json:"l_name"`
+	Password string `json:"password"`
+	Monthly  string `json:"monthly"`
+	Position string `json:"position"`
+}
+
+type Get struct {
 	Id         string `json:"id"`
 	F_name     string `json:"f_name"`
 	L_name     string `json:"l_name"`
@@ -42,7 +58,10 @@ type Hour struct {
 	Monthly   string `json:"monthly"`
 }
 
-
+type GetUser struct {
+	Id       string `json:"id"`
+	Password string `json:"password"`
+}
 
 func (rum *User) Validate() error {
 	return validation.ValidateStruct(

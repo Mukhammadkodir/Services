@@ -1,287 +1,114 @@
 basePath: /v1
 definitions:
-  models.CreateTask:
-    properties:
-      assignee_id:
-        type: string
-      deadline:
-        type: string
-      name:
-        type: string
-      status:
-        type: string
-      summary:
-        type: string
-      title:
-        type: string
-    type: object
   models.CreateUser:
     properties:
-      address:
+      f_name:
         type: string
-      bio:
+      l_name:
         type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      gender:
-        type: string
-      last_name:
-        type: string
-      phone_number:
-        type: string
-      profile_photo:
-        type: string
-      username:
-        type: string
-    type: object
-  models.Error:
-    properties:
-      message:
-        type: string
-    type: object
-  models.Login:
-    properties:
-      email:
+      monthly:
         type: string
       password:
         type: string
-    type: object
-  models.RegisterResponseModel:
-    properties:
-      message:
+      position:
         type: string
     type: object
-  models.StandardErrorModel:
+  models.Get:
     properties:
-      error:
-        $ref: '#/definitions/models.Error'
-    type: object
-  models.Task:
-    properties:
-      Assignee_id:
-        type: string
       created_at:
-        type: string
-      deadline:
         type: string
       deleted_at:
         type: string
+      f_name:
+        type: string
+      hours:
+        $ref: '#/definitions/models.Hour'
       id:
         type: string
-      name:
+      l_name:
         type: string
-      status:
+      monthly:
         type: string
-      summary:
+      password:
         type: string
-      title:
+      position:
         type: string
       updated_at:
         type: string
     type: object
-  models.UpdateTasks:
+  models.GetUser:
     properties:
-      assignee_id:
-        type: string
-      deadline:
-        type: string
       id:
         type: string
-      name:
-        type: string
-      status:
-        type: string
-      summary:
-        type: string
-      title:
+      password:
         type: string
     type: object
-  models.UpdateUser:
+  models.Hour:
     properties:
-      address:
+      Opened:
         type: string
-      bio:
+      closed:
         type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      gender:
+      daily:
         type: string
       id:
         type: string
       last_name:
         type: string
-      phone_number:
+      monthly:
         type: string
-      profile_photo:
+      user_id:
         type: string
-      username:
+    type: object
+  models.UpReq:
+    properties:
+      f_name:
+        type: string
+      l_name:
+        type: string
+      new_password:
+        type: string
+      old_password:
+        type: string
+      position:
         type: string
     type: object
   models.User:
     properties:
-      Email:
-        type: string
-      address:
-        type: string
-      bio:
-        type: string
-      code:
-        type: string
       created_at:
         type: string
       deleted_at:
         type: string
-      first_name:
-        type: string
-      gender:
+      f_name:
         type: string
       id:
         type: string
-      last_name:
+      l_name:
+        type: string
+      monthly:
         type: string
       password:
         type: string
-      phone_number:
-        type: string
-      profile_photo:
+      position:
         type: string
       updated_at:
-        type: string
-      username:
         type: string
     type: object
 info:
   contact: {}
   title: Task api
 paths:
-  /register:
-    post:
-      consumes:
-      - application/json
-      description: Register - API for registering users
-      parameters:
-      - description: register
-        in: body
-        name: register
-        required: true
-        schema:
-          $ref: '#/definitions/models.User'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.RegisterResponseModel'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.StandardErrorModel'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.StandardErrorModel'
-      summary: Register
-      tags:
-      - register
-  /task/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete task
-      parameters:
-      - description: ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-      summary: Delete task
-      tags:
-      - Task
-    get:
-      consumes:
-      - application/json
-      description: Get task
-      parameters:
-      - description: ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Task'
-      summary: Get task
-      tags:
-      - Task
-    put:
-      consumes:
-      - application/json
-      description: Update task
-      parameters:
-      - description: body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.UpdateTasks'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Task'
-      summary: Update task
-      tags:
-      - Task
-  /tasks:
-    post:
-      consumes:
-      - application/json
-      description: This API for creating a new task
-      parameters:
-      - description: body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.CreateTask'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Task'
-      summary: Create new task
-      tags:
-      - Task
   /user:
     post:
       consumes:
       - application/json
       description: Get My Profile
       parameters:
-      - description: body
-        in: body
-        name: body
+      - description: Password
+        in: path
+        name: code
         required: true
-        schema:
-          $ref: '#/definitions/models.Login'
+        type: string
       produces:
       - application/json
       responses:
@@ -300,9 +127,9 @@ paths:
       - application/json
       description: Delete User
       parameters:
-      - description: ID
+      - description: Password
         in: path
-        name: id
+        name: password
         required: true
         type: string
       produces:
@@ -320,18 +147,19 @@ paths:
       - application/json
       description: Get User
       parameters:
-      - description: ID
-        in: path
-        name: id
+      - description: body
+        in: body
+        name: body
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/models.GetUser'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.Get'
       security:
       - BearerAuth: []
       summary: GetUser
@@ -347,7 +175,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/models.UpdateUser'
+          $ref: '#/definitions/models.UpReq'
       produces:
       - application/json
       responses:
@@ -382,35 +210,6 @@ paths:
       summary: Create new user
       tags:
       - User
-  /verify/{code}:
-    post:
-      consumes:
-      - application/json
-      description: returns access token
-      parameters:
-      - description: code
-        in: path
-        name: code
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.User'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.StandardErrorModel'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.StandardErrorModel'
-      summary: Verify
-      tags:
-      - register
 securityDefinitions:
   BearerAuth:
     in: header

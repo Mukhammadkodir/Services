@@ -4,7 +4,6 @@ import (
 	v1 "github/Services/workers/api/handler"
 	"github/Services/workers/config"
 	"github/Services/workers/pkg/logger"
-	"github/Services/workers/services"
 	"github/Services/workers/storage/repo"
 
 	"github/Services/workers/api/docs"
@@ -35,7 +34,6 @@ import (
 type Option struct {
 	Conf            config.Config
 	Logger          logger.Logger
-	ServiceManager  services.IServiceManager
 	InMemoryStorage repo.UserStorageI
 }
 
@@ -48,13 +46,11 @@ func New(option Option) *gin.Engine {
 
 	handlerV1 := v1.New(&v1.HandlerV1Config{
 		Logger:          option.Logger,
-		ServiceManager:  option.ServiceManager,
 		Cfg:             option.Conf,
 		InMemoryStorage: option.InMemoryStorage,
 	})
 
 	api := router.Group("/v1")
-
 
 	api.POST("/users", handlerV1.CreateUser)
 	api.GET("/user/:id", handlerV1.Get)

@@ -23,177 +23,6 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/register": {
-            "post": {
-                "description": "Register - API for registering users",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "register"
-                ],
-                "summary": "Register",
-                "parameters": [
-                    {
-                        "description": "register",
-                        "name": "register",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.RegisterResponseModel"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.StandardErrorModel"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.StandardErrorModel"
-                        }
-                    }
-                }
-            }
-        },
-        "/task/{id}": {
-            "get": {
-                "description": "Get task",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Task"
-                ],
-                "summary": "Get task",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Task"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update task",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Task"
-                ],
-                "summary": "Update task",
-                "parameters": [
-                    {
-                        "description": "body",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UpdateTasks"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Task"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete task",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Task"
-                ],
-                "summary": "Delete task",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/tasks": {
-            "post": {
-                "description": "This API for creating a new task",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Task"
-                ],
-                "summary": "Create new task",
-                "parameters": [
-                    {
-                        "description": "body",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.CreateTask"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Task"
-                        }
-                    }
-                }
-            }
-        },
         "/user": {
             "post": {
                 "security": [
@@ -214,13 +43,11 @@ var doc = `{
                 "summary": "Login",
                 "parameters": [
                     {
-                        "description": "body",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Login"
-                        }
+                        "type": "string",
+                        "description": "Password",
+                        "name": "code",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -253,18 +80,20 @@ var doc = `{
                 "summary": "GetUser",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GetUser"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.Get"
                         }
                     }
                 }
@@ -293,7 +122,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateUser"
+                            "$ref": "#/definitions/models.UpReq"
                         }
                     }
                 ],
@@ -326,8 +155,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID",
-                        "name": "id",
+                        "description": "Password",
+                        "name": "password",
                         "in": "path",
                         "required": true
                     }
@@ -372,171 +201,57 @@ var doc = `{
                     }
                 }
             }
-        },
-        "/verify/{code}": {
-            "post": {
-                "description": "returns access token",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "register"
-                ],
-                "summary": "Verify",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "code",
-                        "name": "code",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.StandardErrorModel"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.StandardErrorModel"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
-        "models.CreateTask": {
-            "type": "object",
-            "properties": {
-                "assignee_id": {
-                    "type": "string"
-                },
-                "deadline": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "summary": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
         "models.CreateUser": {
             "type": "object",
             "properties": {
-                "address": {
+                "f_name": {
                     "type": "string"
                 },
-                "bio": {
+                "l_name": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "profile_photo": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Error": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Login": {
-            "type": "object",
-            "properties": {
-                "email": {
+                "monthly": {
                     "type": "string"
                 },
                 "password": {
                     "type": "string"
-                }
-            }
-        },
-        "models.RegisterResponseModel": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.StandardErrorModel": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "$ref": "#/definitions/models.Error"
-                }
-            }
-        },
-        "models.Task": {
-            "type": "object",
-            "properties": {
-                "Assignee_id": {
-                    "type": "string"
                 },
+                "position": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Get": {
+            "type": "object",
+            "properties": {
                 "created_at": {
-                    "type": "string"
-                },
-                "deadline": {
                     "type": "string"
                 },
                 "deleted_at": {
                     "type": "string"
                 },
+                "f_name": {
+                    "type": "string"
+                },
+                "hours": {
+                    "$ref": "#/definitions/models.Hour"
+                },
                 "id": {
                     "type": "string"
                 },
-                "name": {
+                "l_name": {
                     "type": "string"
                 },
-                "status": {
+                "monthly": {
                     "type": "string"
                 },
-                "summary": {
+                "password": {
                     "type": "string"
                 },
-                "title": {
+                "position": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -544,48 +259,27 @@ var doc = `{
                 }
             }
         },
-        "models.UpdateTasks": {
+        "models.GetUser": {
             "type": "object",
             "properties": {
-                "assignee_id": {
-                    "type": "string"
-                },
-                "deadline": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "summary": {
-                    "type": "string"
-                },
-                "title": {
+                "password": {
                     "type": "string"
                 }
             }
         },
-        "models.UpdateUser": {
+        "models.Hour": {
             "type": "object",
             "properties": {
-                "address": {
+                "Opened": {
                     "type": "string"
                 },
-                "bio": {
+                "closed": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "gender": {
+                "daily": {
                     "type": "string"
                 },
                 "id": {
@@ -594,13 +288,30 @@ var doc = `{
                 "last_name": {
                     "type": "string"
                 },
-                "phone_number": {
+                "monthly": {
                     "type": "string"
                 },
-                "profile_photo": {
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpReq": {
+            "type": "object",
+            "properties": {
+                "f_name": {
                     "type": "string"
                 },
-                "username": {
+                "l_name": {
+                    "type": "string"
+                },
+                "new_password": {
+                    "type": "string"
+                },
+                "old_password": {
+                    "type": "string"
+                },
+                "position": {
                     "type": "string"
                 }
             }
@@ -608,49 +319,31 @@ var doc = `{
         "models.User": {
             "type": "object",
             "properties": {
-                "Email": {
-                    "type": "string"
-                },
-                "address": {
-                    "type": "string"
-                },
-                "bio": {
-                    "type": "string"
-                },
-                "code": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
                 "deleted_at": {
                     "type": "string"
                 },
-                "first_name": {
-                    "type": "string"
-                },
-                "gender": {
+                "f_name": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "last_name": {
+                "l_name": {
+                    "type": "string"
+                },
+                "monthly": {
                     "type": "string"
                 },
                 "password": {
                     "type": "string"
                 },
-                "phone_number": {
-                    "type": "string"
-                },
-                "profile_photo": {
+                "position": {
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }
