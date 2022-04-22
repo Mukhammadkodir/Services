@@ -20,7 +20,7 @@ func NewUserRepo(db *sqlx.DB) *userRepo {
 }
 func (r *userRepo) Create(user *pb.User) (*pb.User, error) {
 	query := `
-    INSERT INTO user2 (
+    INSERT INTO users (
 			id, 
 			f_name, 
 			l_name, 
@@ -54,7 +54,7 @@ func (r *userRepo) Create(user *pb.User) (*pb.User, error) {
 	return user1, nil
 }
 
-func (r *userRepo) Get(in *pb.PasswordReq) (*pb.GetUser, error) {
+func (r *userRepo) Get(in *pb.ById) (*pb.GetUser, error) {
 	var (
 		user       pb.GetUser
 		nullupdate sql.NullString
@@ -69,9 +69,10 @@ func (r *userRepo) Get(in *pb.PasswordReq) (*pb.GetUser, error) {
 				created_at, 
 				updated_at, 
 				deleted_at 
-			FROM user2 
-			WHERE password = $1 AND deleted_at IS NULL`
-	err := r.db.QueryRow(query, in.Password).Scan(
+			FROM users 
+			WHERE id = $1 AND deleted_at IS NULL`
+
+	err := r.db.QueryRow(query, in.Userid).Scan(
 		&user.Id,
 		&user.FName,
 		&user.LName,
@@ -93,14 +94,13 @@ func (r *userRepo) Get(in *pb.PasswordReq) (*pb.GetUser, error) {
 		return nil, err
 	}
 
-	return &user, nil
+	return r.ListUserDay(&user)
 }
 
 func (r *userRepo) Login(in *pb.PasswordReq) (*pb.User, error) {
 	var (
 		user       pb.User
 		nullupdate sql.NullString
-		nulldelete sql.NullString
 	)
 	query := `SELECT 
 				id, 
@@ -110,10 +110,10 @@ func (r *userRepo) Login(in *pb.PasswordReq) (*pb.User, error) {
 				position,
 				monthly,
 				created_at, 
-				updated_at, 
-				deleted_at 
-			FROM user2 
+				updated_at
+			FROM users 
 			WHERE password = $1 AND deleted_at IS NULL`
+
 	err := r.db.QueryRow(query, in.Password).Scan(
 		&user.Id,
 		&user.FName,
@@ -123,14 +123,10 @@ func (r *userRepo) Login(in *pb.PasswordReq) (*pb.User, error) {
 		&user.Monthly,
 		&user.CreatedAt,
 		&nullupdate,
-		&nulldelete,
 	)
 
 	if nullupdate.Valid {
 		user.UpdatedAt = nullupdate.String
-	}
-	if nulldelete.Valid {
-		user.DeletedAt = nulldelete.String
 	}
 
 	if err != nil {
@@ -142,7 +138,7 @@ func (r *userRepo) Login(in *pb.PasswordReq) (*pb.User, error) {
 
 func (r *userRepo) Delete(in *pb.PasswordReq) (*pb.EmptyResp, error) {
 
-	query := `UPDATE user2 SET deleted_at = $1 WHERE password = $2`
+	query := `UPDATE users SET deleted_at = $1 WHERE password = $2`
 
 	res, err := r.db.Exec(query, time.Now().Format("2006-01-02"), in.Password)
 
@@ -166,6 +162,7 @@ func (r *userRepo) Update(user *pb.UpReq) (*pb.User, error) {
 				position 	= $4
 				updated_at 	= $5 
 				WHERE password 	= $6 AND deleted_at IS NULL`
+
 	err := r.db.QueryRow(query,
 		user.FName,
 		user.LName,
@@ -201,7 +198,7 @@ func (r *userRepo) ListUser(req *pb.ListReq) (*pb.ListResp, error) {
 			created_at,
 			deleted_at,
 			updated_at
-        FROM user2
+        FROM users
 		WHERE deleted_at IS NULL
 		LIMIT $1
 		OFFSET $2
@@ -238,7 +235,7 @@ func (r *userRepo) ListUser(req *pb.ListReq) (*pb.ListResp, error) {
 	}
 
 	query = `
-		SELECT count(*) FROM user2
+		SELECT count(*) FROM users
 		WHERE deleted_at IS NULL
 	`
 	err = r.db.DB.QueryRow(query).Scan(&resp.Count)
@@ -253,7 +250,7 @@ func (r *userRepo) CheckField(req *pb.PasswordReq) (*pb.Status, error) {
 	var existsClient pb.Status
 
 	row := r.db.QueryRow(`
-		SELECT position FROM user1 WHERE  password = $1 AND deleted_at IS NULL`, req.Password,
+		SELECT position FROM users WHERE  password = $1 AND deleted_at IS NULL`, req.Password,
 	)
 	if err := row.Scan(&existsClient); err != nil {
 		return &pb.Status{Position: "false"}, err
@@ -298,6 +295,7 @@ func (r *userRepo) CloseDay(req *pb.Hours) (*pb.Hours, error) {
 	query1 := `
 			SELECT date_part('hour',age('$1', '$2'));
 			`
+
 	query2 := `SELECT *
 	FROM time 
 	WHERE date > CURRENT_DATE - INTERVAL '1 MONTH' 
@@ -339,46 +337,35 @@ func (r *userRepo) CloseDay(req *pb.Hours) (*pb.Hours, error) {
 	return nil, nil
 }
 
-// func (r *userRepo) ListTime(req *pb.ById) (*pb.Status, error) {
+func (r *userRepo) ListUserDay(req *pb.GetUser) (*pb.GetUser, error) {
 
-// 	var (
-// 		resp int64
-// 	)
+	query := `SELECT *
+	FROM time 
+	WHERE date > CURRENT_DATE - INTERVAL '1 MONTH' 
+	  AND date < CURRENT_DATE + INTERVAL '1 DAY' AND user_id = $1 ;`
 
-// 	query := `
-// 		SELECT 
-// 			daily
-// 		FROM time
-// 		WHERE user_id = $1 AND closed NOT NULL
-// 	`
-// 	rows, err := r.db.DB.Query(query, req.Userid)
+	rows, err := r.db.Query(query, req.Id)
+	for rows.Next() {
+		var day pb.Hours
+		err = rows.Scan(
+			&day.Id,
+			&day.UserId,
+			&day.Opened,
+			&day.Closed,
+			&day.Daily,
+			&day.Monthly,
+			&day.Date,
+		)
+		req.Hour = append(req.Hour, &day)
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	}
 
-// 	for rows.Next() {
-// 		var time pb.Status
-// 		err = rows.Scan(
-// 			&time.Position,
-// 		)
-// 		if err != nil {
-// 			return nil, err
-// 		}
+	
 
-// 		resp += int64(time.Position)
-// 	}
+	if err != nil {
+		return nil, err
+	}
 
-// 	query = `
-// 		SELECT count(*) FROM user2
-// 		WHERE deleted_at IS NULL
-// 	`
-// 	err = r.db.DB.QueryRow(query).Scan(&resp.Count)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	return req, nil
+}
 
-// 	return &resp, nil
-// }
-
-//select date_part('hour',age('2022-04-19 10:00:00', '2022-04-30 12:00:00'));
