@@ -1,26 +1,40 @@
 package main
 
 import (
+	"fmt"
 	"github/Services/workers/api"
 	"github/Services/workers/config"
-	"github/Services/workers/pkg/logger"
+	"github/Services/workers/storage"
+	_ "github/Services/workers/storage/postgres"
+
+	"github.com/jmoiron/sqlx"
 )
 
 func main() {
-
 	cfg := config.Load()
-	log := logger.New(cfg.LogLevel, "api-gateway")
 
-	
+	psqlString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		cfg.PostgresHost,
+		cfg.PostgresPort,
+		cfg.PostgresUser,
+		cfg.PostgresPassword,
+		cfg.PostgresDatabase,
+	)
 
-	server := api.New(api.Option{
-		Conf:           cfg,
-		Logger:         log,
-	})
-
-	if err := server.Run(cfg.HTTPPort); err != nil {
-		log.Fatal("failed to run http server", logger.Error(err))
+	connDb, err := sqlx.Connect("postgres", psqlString)
+	if err != nil {
 		panic(err)
 	}
 
+	storagePool := storage.NewStoragePg(connDb).User()
+
+	server := api.New(api.Option{
+		Conf:            cfg,
+		InMemoryStorage: storagePool,
+	})
+
+	err = server.Run(cfg.HTTPPort)
+	if err != nil {
+		panic(err)
+	}
 }

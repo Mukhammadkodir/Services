@@ -2,7 +2,8 @@ package postgres
 
 import (
 	"database/sql"
-	pb "github/Services/workers/genproto/user_service"
+
+	"github/Services/workers/storage/models"
 
 	"time"
 
@@ -18,27 +19,24 @@ type userRepo struct {
 func NewUserRepo(db *sqlx.DB) *userRepo {
 	return &userRepo{db: db}
 }
-func (r *userRepo) Create(user *pb.User) (*pb.User, error) {
+func (r *userRepo) Create(m models.User) (*models.User, error) {
 	query := `
-    INSERT INTO users (
-			id, 
+    INSERT INTO users ( id, 
 			f_name, 
 			l_name, 
 			password,
-			monthly,
 			position, 
 			created_at )
-			VALUES($1, $2, $3, $4, $5, $6, $7)`
+			VALUES($1, $2, $3, $4, $5, $6)`
 
 	id := uuid.New().String()
 
 	err := r.db.QueryRow(query,
 		id,
-		user.FName,
-		user.LName,
-		user.Password,
-		user.Monthly,
-		user.Position,
+		m.F_name,
+		m.L_name,
+		m.Password,
+		m.Position,
 		time.Now().Format("2006-01-02"),
 	).Err()
 
@@ -46,7 +44,7 @@ func (r *userRepo) Create(user *pb.User) (*pb.User, error) {
 		return nil, err
 	}
 
-	user1, err := r.Login(&pb.PasswordReq{Password: user.Password})
+	user1, err := r.Login(models.PasswordReq{Password: m.Password})
 	if err != nil {
 		return nil, err
 	}
@@ -54,9 +52,9 @@ func (r *userRepo) Create(user *pb.User) (*pb.User, error) {
 	return user1, nil
 }
 
-func (r *userRepo) Get(in *pb.ById) (*pb.GetUser, error) {
+func (r *userRepo) Get(id models.ById) (*models.Get, error) {
 	var (
-		user       pb.GetUser
+		user       models.Get
 		nullupdate sql.NullString
 		nulldelete sql.NullString
 	)
@@ -72,34 +70,34 @@ func (r *userRepo) Get(in *pb.ById) (*pb.GetUser, error) {
 			FROM users 
 			WHERE id = $1 AND deleted_at IS NULL`
 
-	err := r.db.QueryRow(query, in.Userid).Scan(
+	err := r.db.QueryRow(query, id.Userid).Scan(
 		&user.Id,
-		&user.FName,
-		&user.LName,
+		&user.F_name,
+		&user.L_name,
 		&user.Password,
 		&user.Position,
-		&user.CreatedAt,
+		&user.Created_at,
 		&nullupdate,
 		&nulldelete,
 	)
 
 	if nullupdate.Valid {
-		user.UpdatedAt = nullupdate.String
+		user.Updated_at = nullupdate.String
 	}
 	if nulldelete.Valid {
-		user.DeletedAt = nulldelete.String
+		user.Deleted_at = nulldelete.String
 	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	return r.ListUserDay(&user)
+	return r.ListUserDay(user)
 }
 
-func (r *userRepo) Login(in *pb.PasswordReq) (*pb.User, error) {
+func (r *userRepo) Login(pass models.PasswordReq) (*models.User, error) {
 	var (
-		user       pb.User
+		user       models.User
 		nullupdate sql.NullString
 	)
 	query := `SELECT 
@@ -114,19 +112,19 @@ func (r *userRepo) Login(in *pb.PasswordReq) (*pb.User, error) {
 			FROM users 
 			WHERE password = $1 AND deleted_at IS NULL`
 
-	err := r.db.QueryRow(query, in.Password).Scan(
+	err := r.db.QueryRow(query, pass.Password).Scan(
 		&user.Id,
-		&user.FName,
-		&user.LName,
+		&user.F_name,
+		&user.L_name,
 		&user.Password,
 		&user.Position,
 		&user.Monthly,
-		&user.CreatedAt,
+		&user.Created_at,
 		&nullupdate,
 	)
 
 	if nullupdate.Valid {
-		user.UpdatedAt = nullupdate.String
+		user.Updated_at = nullupdate.String
 	}
 
 	if err != nil {
@@ -136,7 +134,7 @@ func (r *userRepo) Login(in *pb.PasswordReq) (*pb.User, error) {
 	return &user, nil
 }
 
-func (r *userRepo) Delete(in *pb.PasswordReq) (*pb.EmptyResp, error) {
+func (r *userRepo) Delete(in models.PasswordReq) (*models.EmptyResp, error) {
 
 	query := `UPDATE users SET deleted_at = $1 WHERE password = $2`
 
@@ -150,10 +148,10 @@ func (r *userRepo) Delete(in *pb.PasswordReq) (*pb.EmptyResp, error) {
 		return nil, err
 	}
 
-	return &pb.EmptyResp{}, nil
+	return &models.EmptyResp{Message: "Deleted Ok"}, nil
 }
 
-func (r *userRepo) Update(user *pb.UpReq) (*pb.User, error) {
+func (r *userRepo) Update(user models.UpReq) (*models.User, error) {
 
 	query := `UPDATE users SET 
 				f_name 		= $1, 
@@ -164,28 +162,28 @@ func (r *userRepo) Update(user *pb.UpReq) (*pb.User, error) {
 				WHERE password 	= $6 AND deleted_at IS NULL`
 
 	err := r.db.QueryRow(query,
-		user.FName,
-		user.LName,
-		user.NewPassword,
+		user.F_name,
+		user.L_name,
+		user.New_password,
 		user.Position,
 		time.Now().Format("2006-01-02"),
-		user.OldPassword,
+		user.Old_password,
 	).Err()
 
 	if err != nil {
 		return nil, err
 	}
 
-	return r.Login(&pb.PasswordReq{Password: user.NewPassword})
+	return r.Login(models.PasswordReq{Password: user.New_password})
 }
 
-func (r *userRepo) ListUser(req *pb.ListReq) (*pb.ListResp, error) {
+func (r *userRepo) ListUser(req models.ListReq) (*models.ListResp, error) {
 
 	offset := (req.Page - 1) * req.Limit
 	var (
 		nullupdate sql.NullString
 		nulldelete sql.NullString
-		resp       pb.ListResp
+		resp       models.ListResp
 	)
 	query := `
 		SELECT 
@@ -209,15 +207,15 @@ func (r *userRepo) ListUser(req *pb.ListReq) (*pb.ListResp, error) {
 	}
 
 	for rows.Next() {
-		var User pb.User
+		var User models.User
 		err = rows.Scan(
 			&User.Id,
-			&User.FName,
-			&User.LName,
+			&User.F_name,
+			&User.L_name,
 			&User.Password,
 			&User.Monthly,
 			&User.Position,
-			&User.CreatedAt,
+			&User.Created_at,
 			&nulldelete,
 			&nullupdate,
 		)
@@ -225,13 +223,13 @@ func (r *userRepo) ListUser(req *pb.ListReq) (*pb.ListResp, error) {
 			return nil, err
 		}
 		if nullupdate.Valid {
-			User.UpdatedAt = nullupdate.String
+			User.Updated_at = nullupdate.String
 		}
 		if nulldelete.Valid {
-			User.DeletedAt = nulldelete.String
+			User.Deleted_at = nulldelete.String
 		}
 
-		resp.Users = append(resp.Users, &User)
+		resp.Users = append(resp.Users, User)
 	}
 
 	query = `
@@ -246,20 +244,20 @@ func (r *userRepo) ListUser(req *pb.ListReq) (*pb.ListResp, error) {
 	return &resp, nil
 }
 
-func (r *userRepo) CheckField(req *pb.PasswordReq) (*pb.Status, error) {
-	var existsClient pb.Status
+func (r *userRepo) CheckField(pass models.PasswordReq) (*models.Status, error) {
+	var existsClient models.Status
 
 	row := r.db.QueryRow(`
-		SELECT position FROM users WHERE  password = $1 AND deleted_at IS NULL`, req.Password,
+		SELECT position FROM users WHERE  password = $1 AND deleted_at IS NULL`, pass.Password,
 	)
 	if err := row.Scan(&existsClient); err != nil {
-		return &pb.Status{Position: "false"}, err
+		return &models.Status{Position: "false"}, err
 	}
 
 	return &existsClient, nil
 }
 
-func (r *userRepo) OpenDay(req *pb.ById) (*pb.Hours, error) {
+func (r *userRepo) OpenDay(req models.ById) (*models.Hour, error) {
 	query := `
     INSERT INTO time (
 			id, 
@@ -281,10 +279,10 @@ func (r *userRepo) OpenDay(req *pb.ById) (*pb.Hours, error) {
 		return nil, err
 	}
 
-	return nil, nil
+	return r.GetTime(models.ById{Userid: id})
 }
 
-func (r *userRepo) CloseDay(req *pb.Hours) (*pb.Hours, error) {
+func (r *userRepo) CloseDay(req models.Hour) (*models.Hour, error) {
 	query := `
 		UPDATE time set (
 			daily 		= $1, 
@@ -301,11 +299,11 @@ func (r *userRepo) CloseDay(req *pb.Hours) (*pb.Hours, error) {
 	WHERE date > CURRENT_DATE - INTERVAL '1 MONTH' 
 	  AND date < CURRENT_DATE + INTERVAL '1 DAY' AND user_id = $1 ;`
 
-	req.Closed = time.Now().Format("2006-01-02 15:04:00")
+	req.Klozed = time.Now().Format("2006-01-02 15:04:00")
 
 	err := r.db.QueryRow(query1,
 		req.Opened,
-		req.Closed,
+		req.Klozed,
 	).Scan(&req.Daily)
 
 	if err != nil {
@@ -313,7 +311,7 @@ func (r *userRepo) CloseDay(req *pb.Hours) (*pb.Hours, error) {
 	}
 
 	var day int
-	rows, err := r.db.Query(query2, req.UserId)
+	rows, err := r.db.Query(query2, req.User_id)
 	for rows.Next() {
 		err = rows.Scan(
 			&day,
@@ -325,19 +323,19 @@ func (r *userRepo) CloseDay(req *pb.Hours) (*pb.Hours, error) {
 
 	err = r.db.QueryRow(query,
 		req.Daily,
-		req.Closed,
+		req.Klozed,
 		req.Monthly,
-		req.Id,
+		req.ID,
 	).Err()
 
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return r.GetTime(models.ById{Userid: req.ID})
 }
 
-func (r *userRepo) ListUserDay(req *pb.GetUser) (*pb.GetUser, error) {
+func (r *userRepo) ListUserDay(req models.Get) (*models.Get, error) {
 
 	query := `SELECT *
 	FROM time 
@@ -346,26 +344,55 @@ func (r *userRepo) ListUserDay(req *pb.GetUser) (*pb.GetUser, error) {
 
 	rows, err := r.db.Query(query, req.Id)
 	for rows.Next() {
-		var day pb.Hours
+		var day models.Hour
 		err = rows.Scan(
-			&day.Id,
-			&day.UserId,
+			&day.ID,
+			&day.User_id,
 			&day.Opened,
-			&day.Closed,
+			&day.Klozed,
 			&day.Daily,
 			&day.Monthly,
 			&day.Date,
 		)
-		req.Hour = append(req.Hour, &day)
+		req.Hours = append(req.Hours, day)
 
 	}
-
-	
 
 	if err != nil {
 		return nil, err
 	}
 
-	return req, nil
+	return &req, nil
 }
 
+func (r *userRepo) GetTime(id models.ById) (*models.Hour, error) {
+	var (
+		Time models.Hour
+	)
+	query := `SELECT 
+				id, 
+				user_id, 
+				opened,
+				closed, 
+				daily, 
+				date,
+				monthly,
+			FROM time 
+			WHERE id = $1`
+
+	err := r.db.QueryRow(query, id.Userid).Scan(
+		&Time.ID,
+		&Time.User_id,
+		&Time.Opened,
+		&Time.Klozed,
+		&Time.Daily,
+		&Time.Date,
+		&Time.Monthly,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &Time, nil
+}

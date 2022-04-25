@@ -163,7 +163,10 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.EmptyResp"
+                        }
                     }
                 }
             }
@@ -188,7 +191,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateUser"
+                            "$ref": "#/definitions/models.User"
                         }
                     }
                 ],
@@ -204,22 +207,10 @@ var doc = `{
         }
     },
     "definitions": {
-        "models.CreateUser": {
+        "models.EmptyResp": {
             "type": "object",
             "properties": {
-                "f_name": {
-                    "type": "string"
-                },
-                "l_name": {
-                    "type": "string"
-                },
-                "monthly": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "position": {
+                "message": {
                     "type": "string"
                 }
             }
@@ -237,7 +228,10 @@ var doc = `{
                     "type": "string"
                 },
                 "hours": {
-                    "$ref": "#/definitions/models.Hour"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Hour"
+                    }
                 },
                 "id": {
                     "type": "string"
@@ -280,6 +274,9 @@ var doc = `{
                     "type": "string"
                 },
                 "daily": {
+                    "type": "string"
+                },
+                "date": {
                     "type": "string"
                 },
                 "id": {
@@ -373,7 +370,7 @@ var SwaggerInfo = swaggerInfo{
 	Host:        "",
 	BasePath:    "/v1",
 	Schemes:     []string{},
-	Title:       "Task api",
+	Title:       "Register api",
 	Description: "",
 }
 

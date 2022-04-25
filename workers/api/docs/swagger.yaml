@@ -1,16 +1,8 @@
 basePath: /v1
 definitions:
-  models.CreateUser:
+  models.EmptyResp:
     properties:
-      f_name:
-        type: string
-      l_name:
-        type: string
-      monthly:
-        type: string
-      password:
-        type: string
-      position:
+      message:
         type: string
     type: object
   models.Get:
@@ -22,7 +14,9 @@ definitions:
       f_name:
         type: string
       hours:
-        $ref: '#/definitions/models.Hour'
+        items:
+          $ref: '#/definitions/models.Hour'
+        type: array
       id:
         type: string
       l_name:
@@ -50,6 +44,8 @@ definitions:
       closed:
         type: string
       daily:
+        type: string
+      date:
         type: string
       id:
         type: string
@@ -96,7 +92,7 @@ definitions:
     type: object
 info:
   contact: {}
-  title: Task api
+  title: Register api
 paths:
   /user:
     post:
@@ -136,7 +132,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: ""
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EmptyResp'
       security:
       - BearerAuth: []
       summary: DeleteUser
@@ -199,7 +197,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/models.CreateUser'
+          $ref: '#/definitions/models.User'
       produces:
       - application/json
       responses:

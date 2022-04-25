@@ -1,10 +1,7 @@
 package handlers
 
 import (
-	"github/Services/workers/api/models"
-	_ "github/Services/workers/api/models"
-	pb "github/Services/workers/genproto/user_service"
-	l "github/Services/workers/pkg/logger"
+	"github/Services/workers/storage/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,13 +13,15 @@ import (
 // @Description This API for creating a new user
 // @Tags User
 // @Accept json
-// @Param body body models.CreateUser true "body"
+// @Param body body models.User true "body"
 // @Produce json
 // @Success 201 {object} models.User
+// @Failure 401 {object} models.Err
+// @Failure 500 {object} models.Err
 // @Router /users [post]
 func (h *handlerV1) CreateUser(c *gin.Context) {
 	var (
-		body        pb.User
+		body        models.User
 		jspbMarshal protojson.MarshalOptions
 	)
 
@@ -33,17 +32,15 @@ func (h *handlerV1) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to bind json", l.Error(err))
 		return
 	}
 
-	response, err := h.inMemoryStorage.Create(&body)
+	response, err := h.inMemoryStorage.Create(body)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to create user", l.Error(err))
 		return
 	}
 
@@ -60,10 +57,12 @@ func (h *handlerV1) CreateUser(c *gin.Context) {
 // @Param body body models.GetUser true "body"
 // @Produce json
 // @Success 200 {object} models.Get
+// @Failure 401 {object} models.Err
+// @Failure 500 {object} models.Err
 // @Router /user/{id} [get]
 func (h *handlerV1) Get(c *gin.Context) {
 	var (
-		body        pb.LogReq
+		body        models.GetUser
 		jspbMarshal protojson.MarshalOptions
 	)
 
@@ -74,29 +73,26 @@ func (h *handlerV1) Get(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to bind json", l.Error(err))
 		return
 	}
 
-	res, _ := h.inMemoryStorage.CheckField(&pb.PasswordReq{Password: body.Password})
+	res, _ := h.inMemoryStorage.CheckField(models.PasswordReq{Password: body.Password})
 
-	if res.Position != "Admin" {
+	if res.Position != "admin" {
 		c.JSON(http.StatusBadRequest, models.ResponseError{
 			Error: models.InternalServerError{
 				Message: "You have not permission to get user information",
 			},
 		})
-		h.log.Error("failed to get User", l.Error(err))
 		return
 	}
 
-	response, err := h.inMemoryStorage.Get(&pb.ById{Userid: body.Id})
+	response, err := h.inMemoryStorage.Get(models.ById{Userid: body.Id})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to get User", l.Error(err))
 		return
 	}
 
@@ -114,17 +110,18 @@ func (h *handlerV1) Get(c *gin.Context) {
 // @Param code path string true "Password"
 // @Produce json
 // @Success 200 {object} models.User
+// @Failure 401 {object} models.Err
+// @Failure 500 {object} models.Err
 // @Router /user [post]
 func (h *handlerV1) Login(c *gin.Context) {
 	code := c.Param("code")
 
-	response, err := h.inMemoryStorage.Login(&pb.PasswordReq{Password: code})
+	response, err := h.inMemoryStorage.Login(models.PasswordReq{Password: code})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to get User Profile", l.Error(err))
 		return
 	}
 
@@ -141,10 +138,12 @@ func (h *handlerV1) Login(c *gin.Context) {
 // @Param body body models.UpReq true "body"
 // @Produce json
 // @Success 200 {object} models.User
+// @Failure 401 {object} models.Err
+// @Failure 500 {object} models.Err
 // @Router /user/{id} [put]
 func (h *handlerV1) UpdateUser(c *gin.Context) {
 	var (
-		body        pb.UpReq
+		body        models.UpReq
 		jspbMarshal protojson.MarshalOptions
 	)
 
@@ -155,18 +154,16 @@ func (h *handlerV1) UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to bind json", l.Error(err))
 		return
 	}
 
-	bul, err := h.inMemoryStorage.Update(&body)
+	bul, err := h.inMemoryStorage.Update(body)
 
 	err = c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to bind json", l.Error(err))
 		return
 	}
 
@@ -181,7 +178,9 @@ func (h *handlerV1) UpdateUser(c *gin.Context) {
 // @Param password path string true "Password"
 // @Accept json
 // @Produce json
-// @Success 200
+// @Success 200 {object} models.EmptyResp
+// @Failure 401 {object} models.Err
+// @Failure 500 {object} models.Err
 // @Router /user/{id} [delete]
 func (h *handlerV1) DeleteUser(c *gin.Context) {
 	var jspbMarshal protojson.MarshalOptions
@@ -189,12 +188,11 @@ func (h *handlerV1) DeleteUser(c *gin.Context) {
 
 	guid := c.Param("password")
 
-	response, err := h.inMemoryStorage.Delete(&pb.PasswordReq{Password: guid})
+	response, err := h.inMemoryStorage.Delete(models.PasswordReq{Password: guid})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to delete User", l.Error(err))
 		return
 	}
 

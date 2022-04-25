@@ -3,7 +3,6 @@ package api
 import (
 	v1 "github/Services/workers/api/handler"
 	"github/Services/workers/config"
-	"github/Services/workers/pkg/logger"
 	"github/Services/workers/storage/repo"
 
 	"github/Services/workers/api/docs"
@@ -13,7 +12,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// @title 			Task api
+// @title 			Register api
 // @version			1.0
 // @description		This is User and Task service Api
 // @termsOfService	http://swagger.io/terms/
@@ -33,31 +32,27 @@ import (
 
 type Option struct {
 	Conf            config.Config
-	Logger          logger.Logger
 	InMemoryStorage repo.UserStorageI
 }
 
 func New(option Option) *gin.Engine {
-	router := gin.New()
+	router := gin.Default()
 
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
 	docs.SwaggerInfo.BasePath = "/v1"
+	router.Use(gin.Logger())
 
 	handlerV1 := v1.New(&v1.HandlerV1Config{
-		Logger:          option.Logger,
 		Cfg:             option.Conf,
 		InMemoryStorage: option.InMemoryStorage,
 	})
 
-	api := router.Group("/v1")
 
-	api.POST("/users", handlerV1.CreateUser)
-	api.GET("/user/:id", handlerV1.Get)
-	api.PUT("/user/:id", handlerV1.UpdateUser)
-	api.DELETE("/user/:id", handlerV1.DeleteUser)
+	router.POST("/users", handlerV1.CreateUser)
+	router.GET("/user/:id", handlerV1.Get)
+	router.PUT("/user/:id", handlerV1.UpdateUser)
+	router.DELETE("/user/:id", handlerV1.DeleteUser)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	api.POST("/user", handlerV1.Login)
+	router.POST("/user", handlerV1.Login)
 
 	return router
 }

@@ -7,16 +7,18 @@ import (
 )
 
 type Config struct {
-	Enivorentment   string
+	Enivorentment string
 
-	UserServiceHost string
-	UserServicePort int
-	CtxTimeout      int
+	CtxTimeout int
 
 	LogLevel string
 	HTTPPort string
 
-	
+	PostgresHost     string
+	PostgresPort     int
+	PostgresDatabase string
+	PostgresUser     string
+	PostgresPassword string
 }
 
 func Load() Config {
@@ -24,14 +26,16 @@ func Load() Config {
 
 	c.Enivorentment = cast.ToString(getOrReturnDefault("ENVIRONMENT", "develop"))
 
-	c.LogLevel = cast.ToString(getOrReturnDefault("LOG_LEVEL", "debug"))
-	c.HTTPPort = cast.ToString(getOrReturnDefault("HTTP_PORT", ":8080"))
-	
-	
-	c.UserServiceHost = cast.ToString(getOrReturnDefault("USER_SERVICE_HOST", "localhost"))
-	c.UserServicePort = cast.ToInt(getOrReturnDefault("USER_SERVICE_PORT", 9191))
+	c.PostgresHost = cast.ToString(getOrReturnDefault("POSTGRES_HOST", "localhost"))
+	c.PostgresPort = cast.ToInt(getOrReturnDefault("POSTGRES_PORT", 5432))
+	c.PostgresUser = cast.ToString(getOrReturnDefault("POSTGRES_USER", "coder"))
+	c.PostgresPassword = cast.ToString(getOrReturnDefault("POSTGRES_PASSWORD", "123"))
+	c.PostgresDatabase = cast.ToString(getOrReturnDefault("POSTGRES_DATABASE", "postgres"))
 
-	c.CtxTimeout = cast.ToInt(getOrReturnDefault("CTX_TIMEOUT", 7))
+	//c.LogLevel = cast.ToString(getOrReturnDefault("LOG_LEVEL", "debug"))
+	c.HTTPPort = cast.ToString(getOrReturnDefault("HTTP_PORT", ":8080"))
+
+	//c.CtxTimeout = cast.ToInt(getOrReturnDefault("CTX_TIMEOUT", 7))
 
 	return c
 }

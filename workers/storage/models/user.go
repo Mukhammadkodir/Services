@@ -1,12 +1,5 @@
 package models
 
-import (
-	"regexp"
-
-	validation "github.com/go-ozzo/ozzo-validation"
-	_ "github.com/go-ozzo/ozzo-validation/is"
-)
-
 type User struct {
 	Id         string `json:"id"`
 	F_name     string `json:"f_name"`
@@ -20,10 +13,14 @@ type User struct {
 }
 
 type UpReq struct {
-	F_name   string `json:"f_name"`
-	L_name   string `json:"l_name"`
+	F_name       string `json:"f_name"`
+	L_name       string `json:"l_name"`
 	New_password string `json:"new_password"`
-	Old_password  string `json:"old_password"`
+	Old_password string `json:"old_password"`
+	Position     string `json:"position"`
+}
+
+type Status struct {
 	Position string `json:"position"`
 }
 
@@ -45,7 +42,7 @@ type Get struct {
 	Created_at string `json:"created_at"`
 	Updated_at string `json:"updated_at"`
 	Deleted_at string `json:"deleted_at"`
-	Hours      Hour   `json:"hours"`
+	Hours      []Hour `json:"hours"`
 }
 
 type Hour struct {
@@ -53,9 +50,10 @@ type Hour struct {
 	User_id   string `json:"user_id"`
 	Last_name string `json:"last_name"`
 	Opened    string `json:"Opened"`
-	Closed    string `json:"closed`
 	Daily     string `json:"daily"`
 	Monthly   string `json:"monthly"`
+	Date      string `json:"date"`
+	Klozed    string `json:"klozed"`
 }
 
 type GetUser struct {
@@ -63,9 +61,24 @@ type GetUser struct {
 	Password string `json:"password"`
 }
 
-func (rum *User) Validate() error {
-	return validation.ValidateStruct(
-		rum,
-		validation.Field(&rum.Password, validation.Required, validation.Length(8, 15), Match(regexp.MustCompile("[0-9]"))),
-	)
+type PasswordReq struct {
+	Password string `json:"password"`
+}
+
+type ById struct {
+	Userid string `json:"userid"`
+}
+
+type ListResp struct {
+	Users []User `json:"users"`
+	Count string `json:"count"`
+}
+
+type ListReq struct {
+	Page  int64 `json:"page" `
+	Limit int64 `json:"limit"`
+}
+
+type EmptyResp struct {
+	Message string `json:"message"`
 }
