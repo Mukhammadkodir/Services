@@ -15,11 +15,11 @@ type Config struct {
 	PostgresUser     string
 	PostgresPassword string
 
-	LogLevel         string
-	RPCPort          string
+	LogLevel string
+	RPCPort  string
 
-	TaskServiceHost  string
-	TaskServicePort  int
+	TaskServiceHost string
+	TaskServicePort int
 }
 
 // Load loads environment vars and inflates Config

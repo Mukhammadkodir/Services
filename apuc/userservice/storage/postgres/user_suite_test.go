@@ -26,17 +26,16 @@ func (suite *UserRepoTestSuite) SetupSuite() {
 func (suite *UserRepoTestSuite) TestUserCRUD() {
 	User := pb.User{
 		Id:       "fe66a4bb-4c19-40a1-a5a2-ae8b3eb0cb62",
-		Name:    "garry1",
-		Username:     "hurry",
-		City: 	"Tashkent",
+		Name:     "garry1",
+		Username: "hurry",
+		City:     "Tashkent",
 	}
-
 
 	User1, err := suite.Repository.Create(&User)
 	suite.Nil(err)
 	suite.NotNil(User1)
-	
-	getUser, err := suite.Repository.Get(&pb.ById{ Userid: User.Id })
+
+	getUser, err := suite.Repository.Get(&pb.ById{Userid: User.Id})
 	suite.Nil(err)
 	suite.NotNil(getUser, "User must not be nil")
 	suite.Equal(User.Id, getUser.Id, "Asignees must match")
@@ -45,7 +44,7 @@ func (suite *UserRepoTestSuite) TestUserCRUD() {
 	updatedUser, err := suite.Repository.Update(&User)
 	suite.Nil(err)
 	suite.Equal(updatedUser.Name, User.Name, "Titles must match")
-	
+
 	_, err = suite.Repository.Delete(&pb.ById{Userid: User.Id})
 	suite.Nil(err)
 

@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.3.0
-	github.com/jmoiron/sqlx v1.3.4
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.5
 	github.com/spf13/cast v1.4.1
 	github.com/stretchr/testify v1.7.1

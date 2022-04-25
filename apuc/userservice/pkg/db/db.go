@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github/Services/apuc/userservice/config"
 	"fmt"
+	"github/Services/apuc/userservice/config"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" //postgres drivers
