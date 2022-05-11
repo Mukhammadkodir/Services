@@ -6,7 +6,6 @@ import (
 	pb "github/Services/post_task/post_service/genproto/post_service"
 
 	l "github/Services/post_task/post_service/pkg/logger"
-	//grpcClient "github/Services/post_task/post_service/service/grpc_client"
 	"github/Services/post_task/post_service/storage"
 
 	"github.com/jmoiron/sqlx"
@@ -15,14 +14,12 @@ import (
 type PostService struct {
 	storage storage.IStorage
 	logger  l.Logger
-	//client  grpcClient.GrpcClientI
 }
 
 func NewPostService(db *sqlx.DB, log l.Logger) *PostService {
 	return &PostService{
 		storage: storage.NewStoragePg(db),
 		logger:  log,
-	//	client:  client,
 	}
 }
 

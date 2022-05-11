@@ -8,7 +8,6 @@ import (
 	"github/Services/post_task/post_service/service"
 	"net"
 
-	//	"github/Services/post_task/post_service/service/grpc_client"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
