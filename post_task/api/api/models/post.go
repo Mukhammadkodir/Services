@@ -21,12 +21,12 @@ type CreatedPost struct {
 	Link string `json:"link"`
 }
 
-type List struct{
-	Page int64 `json:"page"`
+type List struct {
+	Page  int64 `json:"page"`
 	Limit int64 `json:"limit"`
 }
 
-type ListRes struct{
-	Posts []Post `json:"posts"`
+type ListRes struct {
+	Posts Post  `json:"posts"`
 	Count int64 `json:"count"`
 }

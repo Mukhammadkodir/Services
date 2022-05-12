@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 	pb "github/Services/post_task/post_service/genproto/post_service"
 	"time"
 
@@ -24,7 +25,10 @@ func (r *PostRepo) Get(id string) (*pb.Post, error) {
         WHERE id = $1
 		AND deleted_at IS NULL
     `
-	var post pb.Post
+	var (
+		post       pb.Post
+		nullupdate sql.NullString
+	)
 	err := r.db.DB.QueryRow(query,
 		id,
 	).Scan(
@@ -32,9 +36,12 @@ func (r *PostRepo) Get(id string) (*pb.Post, error) {
 		&post.UserId,
 		&post.Title,
 		&post.Body,
-		&post.UpdatedAt,
+		&nullupdate,
 		&post.CreatedAt,
 	)
+	if nullupdate.Valid {
+		post.UpdatedAt = nullupdate.String
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -43,8 +50,11 @@ func (r *PostRepo) Get(id string) (*pb.Post, error) {
 
 func (r *PostRepo) List(req *pb.ListReq) (*pb.ListRes, error) {
 	offset := (req.Page - 1) * req.Limit
-	var resp pb.ListRes
-
+	fmt.Println("\n\n>>", req)
+	var (
+		resp       pb.ListRes
+		nullupdate sql.NullString
+	)
 	query := `
 		SELECT 
 			id, user_id, title, body, updated_at, created_at
@@ -65,9 +75,12 @@ func (r *PostRepo) List(req *pb.ListReq) (*pb.ListRes, error) {
 			&post.UserId,
 			&post.Title,
 			&post.Body,
-			&post.UpdatedAt,
+			&nullupdate,
 			&post.CreatedAt,
 		)
+		if nullupdate.Valid {
+			post.UpdatedAt = nullupdate.String
+		}
 		if err != nil {
 			return nil, err
 		}

@@ -72,9 +72,13 @@ func GetPosts(url string) (*pb.Pages, error) {
 
 	var posts All
 	var all pb.Pages
-	count := 1
 
-	for count <= 50 {
+	err := GetJson(url, &posts)
+	if err != nil {
+		fmt.Printf("error getting posts: %s\n", err.Error())
+	}
+
+	for posts.Meta.Pagination.Page <= 50 {
 
 		err := GetJson(url, &posts)
 
@@ -91,14 +95,14 @@ func GetPosts(url string) (*pb.Pages, error) {
 				post.Body = posts.Data[j].Body
 
 				all.Posts = append(all.Posts, &post)
-				count++
-				if count >= 50 {
+				if posts.Meta.Pagination.Page >= 50 {
 					break
 				}
 			}
 
 		}
 		url = posts.Meta.Pagination.Links.Next
+
 	}
 	return &all, nil
 }

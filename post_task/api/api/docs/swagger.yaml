@@ -77,19 +77,18 @@ paths:
       - application/json
       description: Get post
       parameters:
-      - description: body
-        in: body
-        name: body
+      - description: ID
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/models.List'
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ListRes'
+            $ref: '#/definitions/models.Post'
       summary: Get post
       tags:
       - Post
@@ -132,6 +131,28 @@ paths:
         "200":
           description: ""
       summary: Create new post
+      tags:
+      - Post
+  /posts/:
+    put:
+      consumes:
+      - application/json
+      description: Get posts
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.List'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ListRes'
+      summary: Get posts
       tags:
       - Post
 securityDefinitions:

@@ -116,32 +116,41 @@ func (h *handlerV1) DeletePost(c *gin.Context) {
 }
 
 // GetList godoc
-// @Summary Get post
-// @Description  Get post
+// @Summary Get posts
+// @Description  Get posts
 // @Tags Post
 // @Accept json
 // @Param body body models.List true "body"
 // @Produce json
 // @Success 200 {object} models.ListRes
-// @Router /post/{id} [get]
+// @Router /posts/ [put]
 func (h *handlerV1) GetList(c *gin.Context) {
-	var jspbMarshal protojson.MarshalOptions
+	var (
+		body        pb.ListReq
+		jspbMarshal protojson.MarshalOptions
+	)
 	jspbMarshal.UseProtoNames = true
 
-	guid := c.Param("id")
+	err := c.ShouldBindJSON(&body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		h.log.Error("failed to bind json", l.Error(err))
+		return
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
 	defer cancel()
 
-	response, err := h.serviceManager.PostService().Get(ctx, &pb.IdP{Id: guid})
+	response, err := h.serviceManager.PostService().List(ctx, &body)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to get post", l.Error(err))
+		h.log.Error("failed to update post", l.Error(err))
 		return
 	}
 
 	c.JSON(http.StatusOK, response)
-
 }
