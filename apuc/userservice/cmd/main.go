@@ -2,11 +2,13 @@ package main
 
 import (
 	"github/Services/apuc/userservice/config"
+	"github/Services/apuc/userservice/events"
 	pb "github/Services/apuc/userservice/genproto/user_service"
 	"github/Services/apuc/userservice/pkg/db"
 	"github/Services/apuc/userservice/pkg/logger"
+	"github/Services/apuc/userservice/pkg/messagebroker"
 	"github/Services/apuc/userservice/service"
-	"github/Services/apuc/userservice/service/grpcclient"
+	grpc_client "github/Services/apuc/userservice/service/grpcclient"
 
 	"net"
 
@@ -36,7 +38,21 @@ func main() {
 		return
 	}
 
-	userService := service.NewUserService(connDB, log, grpcClient)
+	//Kafka
+	publisherMap := make(map[string]messagebroker.Publisher)
+
+	userTopicPublisher := events.NewKafkaProducerBroker(cfg, log, "user.user")
+	defer func() {
+		err := userTopicPublisher.Stop()
+		if err != nil {
+			log.Fatal("failed to stop kafka user", logger.Error(err))
+		}
+	}()
+
+	publisherMap["user"] = userTopicPublisher
+	//Kafka End
+
+	userService := service.NewUserService(connDB, log, grpcClient, publisherMap)
 
 	lis, err := net.Listen("tcp", cfg.RPCPort)
 	if err != nil {
