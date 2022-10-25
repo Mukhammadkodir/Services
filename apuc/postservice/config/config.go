@@ -22,6 +22,9 @@ type Config struct {
 	CommentServiceHost  string
 	CommentServicePort  int
 
+	KafkaHost string
+	KafkaPort int
+
 }
 
 // Load loads environment vars and inflates Config
@@ -41,6 +44,10 @@ func Load() Config {
 
 	c.CommentServiceHost = cast.ToString(getOrReturnDefault("COMMENT_SERVICE_HOST", "localhost"))
 	c.CommentServicePort = cast.ToInt(getOrReturnDefault("COMMENT_SERVICE_PORT", 9292))
+
+	c.KafkaHost = cast.ToString(getOrReturnDefault("KAFKA_HOST", "127.0.0.1"))
+	c.KafkaPort = cast.ToInt(getOrReturnDefault("KAFKA_PORT", 9092))
+
 
 	return c
 }

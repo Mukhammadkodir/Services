@@ -8,3 +8,7 @@ CREATE TABLE IF NOT EXISTS post7 (
     updated_at date,
     deleted_at date
 );
+
+
+alter TABLE migrat add column if not EXISTS newcolumn TEXT;
+alter TABLE if EXISTS migrat drop column if EXISTS columnname;
