@@ -1,8 +1,8 @@
 package models
 
-import (
-	validation "github.com/go-ozzo/ozzo-validation/v3"
-)
+// import (
+// 	validation "github.com/go-ozzo/ozzo-validation/v3"
+// )
 
 type User struct {
 	Id         string `json:"id"`
@@ -27,11 +27,11 @@ type UpdateUser struct {
 	City     string `json:"city"`
 }
 
-func (rum *User) Validate() error {
-	return validation.ValidateStruct(
-		rum,
-		validation.Field(&rum.Name, validation.Required, validation.Length(1, 30)),
-		validation.Field(&rum.City, validation.Required, validation.Length(1, 30)),
-		validation.Field(&rum.Username, validation.Required, validation.Length(5, 30)),
-	)
-}
+// func (rum *User) Validate() error {
+// 	return validation.ValidateStruct(
+// 		rum,
+// 		validation.Field(&rum.Name, validation.Required, validation.Length(1, 30)),
+// 		validation.Field(&rum.City, validation.Required, validation.Length(1, 30)),
+// 		validation.Field(&rum.Username, validation.Required, validation.Length(5, 30)),
+// 	)
+// }

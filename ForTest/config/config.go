@@ -7,19 +7,17 @@ import (
 )
 
 type Config struct {
-	Enivorentment   string
+	Enivorentment    string
 	PostgresHost     string
 	PostgresPort     int
 	PostgresDatabase string
 	PostgresUser     string
 	PostgresPassword string
-	
-	CtxTimeout      int
+
+	CtxTimeout int
 
 	LogLevel string
 	HTTPPort string
-
-	
 }
 
 func Load() Config {
@@ -29,15 +27,13 @@ func Load() Config {
 
 	c.PostgresHost = cast.ToString(getOrReturnDefault("POSTGRES_HOST", "localhost"))
 	c.PostgresPort = cast.ToInt(getOrReturnDefault("POSTGRES_PORT", 5432))
-	c.PostgresDatabase = cast.ToString(getOrReturnDefault("POSTGRES_DATABASE", "postgres"))
+	c.PostgresDatabase = cast.ToString(getOrReturnDefault("POSTGRES_DATABASE", "newpro"))
 	c.PostgresUser = cast.ToString(getOrReturnDefault("POSTGRES_USER", "coder"))
 	c.PostgresPassword = cast.ToString(getOrReturnDefault("POSTGRES_PASSWORD", "123"))
 
-
 	c.LogLevel = cast.ToString(getOrReturnDefault("LOG_LEVEL", "debug"))
 	c.HTTPPort = cast.ToString(getOrReturnDefault("HTTP_PORT", ":8080"))
-	
-	
+
 	c.CtxTimeout = cast.ToInt(getOrReturnDefault("CTX_TIMEOUT", 7))
 
 	return c
