@@ -103,7 +103,7 @@ func (h *handlerV1) UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("failed to bind json of user", l.Error(err))
+		h.log.Error("failed to bind json of body", l.Error(err))
 		return
 	}
 
@@ -136,7 +136,6 @@ func (h *handlerV1) DeleteUser(c *gin.Context) {
 
 	guid := c.Param("id")
 	
-
 	response, err := h.storageManager.User().Delete(&pb.ById{Userid: guid})
 
 	if err != nil {
