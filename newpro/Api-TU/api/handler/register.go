@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -146,7 +145,6 @@ func (h *handlerV1) Register(c *gin.Context) {
 		h.log.Error("Error while sending verification code to user", l.Error(err))
 		return
 	}
-	fmt.Println("\n\n\n\n\n\n",err)
 
 	data := models.User{
 		First_name:    body.First_name,
