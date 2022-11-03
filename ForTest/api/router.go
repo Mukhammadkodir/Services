@@ -42,8 +42,11 @@ type Option struct {
 
 func New(option Option) *gin.Engine {
 	router := gin.New()
-	cfg := config.Load()
-
+	cfg,err := config.Load()
+	if err != nil {
+		log.Print("1: ", err)
+	}
+	
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	docs.SwaggerInfo.BasePath = "/v1"

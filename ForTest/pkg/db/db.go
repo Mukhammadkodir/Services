@@ -9,15 +9,23 @@ import (
 )
 
 func ConnectToDB(cfg config.Config) (*sqlx.DB, error) {
-	psqlString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		cfg.PostgresHost,
-		cfg.PostgresPort,
-		cfg.PostgresUser,
-		cfg.PostgresPassword,
-		cfg.PostgresDatabase,
-	)
+	// psqlString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	// 	cfg.PostgresHost,
+	// 	cfg.PostgresPort,
+	// 	cfg.PostgresUser,
+	// 	cfg.PostgresPassword,
+	// 	cfg.PostgresDB,
+	// )
 
-	connDb, err := sqlx.Connect("postgres", psqlString)
+	connDb, err := sqlx.Connect("postgres", fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		cfg.PostgresHost, 
+		cfg.PostgresPort, 
+		cfg.PostgresUser, 
+		cfg.PostgresPassword, 
+		cfg.PostgresDB,
+	),
+)
 	if err != nil {
 		return nil, err
 	}
@@ -26,14 +34,16 @@ func ConnectToDB(cfg config.Config) (*sqlx.DB, error) {
 }
 
 func ConnectDbForSuite(cfg config.Config) (*sqlx.DB, func()) {
-	psqlString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		cfg.PostgresHost,
-		cfg.PostgresPort,
-		cfg.PostgresUser,
-		cfg.PostgresPassword,
-		cfg.PostgresDatabase,
-	)
-	connDb, err := sqlx.Connect("postgres", psqlString)
+	
+	connDb, err := sqlx.Connect("postgres", fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		cfg.PostgresHost, 
+		cfg.PostgresPort, 
+		cfg.PostgresUser, 
+		cfg.PostgresPassword, 
+		cfg.PostgresDB,
+	),
+)
 	if err != nil {
 		panic(err)
 	}

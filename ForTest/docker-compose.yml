@@ -1,0 +1,26 @@
+version: "3.3"
+
+services:
+  postgres:
+    container_name: database
+    image: postgres:14.4
+    environment:
+        POSTGRES_DATABASE: newpro
+        POSTGRES_USER: coder
+        POSTGRES_PASSWORD: 123
+        PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres 
+    ports:
+      - "5432:5432"
+
+  api:
+    container_name: api 
+    build: api
+    depends_on:
+      - database
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres:

@@ -5,3 +5,4 @@ WORKDIR /api
 RUN go mod tidy
 RUN go build -o main cmd/main.go
 CMD ./main
+EXPOSE 8080
